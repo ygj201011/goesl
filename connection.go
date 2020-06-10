@@ -182,7 +182,7 @@ func (c *SocketConnection) OriginatorAddr() net.Addr {
 }
 
 // ReadMessage - Will read message from channels and return them back accordingy.
-// If error is received, error will be returned. If not, message will be returned back!
+// If error is received, error will be returned. If not, message will be returned back!
 func (c *SocketConnection) ReadMessage() (*Message, error) {
 	Debug("Waiting for connection message to be received ...")
 
@@ -191,6 +191,8 @@ func (c *SocketConnection) ReadMessage() (*Message, error) {
 		return nil, err
 	case msg := <-c.m:
 		return msg, nil
+	case <-time.After(time.Second):
+        	return nil,nil
 	}
 }
 
