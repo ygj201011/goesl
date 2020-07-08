@@ -184,7 +184,7 @@ func (c *SocketConnection) OriginatorAddr() net.Addr {
 // ReadMessage - Will read message from channels and return them back accordingy.
 // If error is received, error will be returned. If not, message will be returned back!
 func (c *SocketConnection) ReadMessage() (*Message, error) {
-	Debug("Waiting for connection message to be received ...")
+	// Debug("Waiting for connection message to be received ...")
 
 	select {
 	case err := <-c.err:
@@ -198,6 +198,7 @@ func (c *SocketConnection) ReadMessage() (*Message, error) {
 
 // Handle - Will handle new messages and close connection when there are no messages left to process
 func (c *SocketConnection) Handle() {
+	Debug("Handle ...")
 
 	done := make(chan bool)
 
@@ -208,6 +209,7 @@ func (c *SocketConnection) Handle() {
 			msg, err := newMessage(rbuf, true)
 
 			if err != nil {
+				Debug("send err :",err)
 				c.err <- err
 				done <- true
 				break
@@ -221,12 +223,27 @@ func (c *SocketConnection) Handle() {
 
 	// Closing the connection now as there's nothing left to do ...
 	c.Close()
+
+	Debug("Closing the connection now as there's nothing left to do ...")
 }
 
 // Close - Will close down net connection and return error if error happen
 func (c *SocketConnection) Close() error {
+	Debug("Close ...")
 	if err := c.Conn.Close(); err != nil {
-		return err
+		Debug("Close err :",err)
+	}
+
+	for {
+		select {
+		case err := <- c.err:
+			Debug("Closing err :",err)
+		case message := <- c.m:
+			Debug("Closing message :",message)
+		case <-time.After(5*time.Second):
+			Debug("Closing timeout")
+			return nil
+		}
 	}
 
 	return nil
