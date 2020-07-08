@@ -80,7 +80,7 @@ func (m *Message) Parse() error {
 
 	msgType := cmr.Get("Content-Type")
 
-	Debug("Got message content (type: %s). Searching if we can handle it ...", msgType)
+	// Debug("Got message content (type: %s). Searching if we can handle it ...", msgType)
 
 	if !StringInSlice(msgType, AvailableMessageTypes) {
 		return fmt.Errorf(EUnsupportedMessageType, msgType, AvailableMessageTypes)
