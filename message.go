@@ -56,7 +56,7 @@ func (m *Message) Parse() error {
 	}
 
 	if cmr.Get("Content-Type") == "" {
-		Debug("Not accepting message because of empty content type. Just whatever with it ...")
+		// Debug("Not accepting message because of empty content type. Just whatever with it ...")
 		return fmt.Errorf("Parse EOF")
 	}
 
