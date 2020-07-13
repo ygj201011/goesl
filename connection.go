@@ -167,12 +167,14 @@ func (c *SocketConnection) SendMsg(msg map[string]string, uuid, data string) (m 
 	}
 	c.mtx.Unlock()
 
-	select {
-	case err := <-c.err:
-		return nil, err
-	case m := <-c.m:
-		return m, nil
-	}
+	return nil,nil
+
+	// select {
+	// case err := <-c.err:
+	// 	return nil, err
+	// case m := <-c.m:
+	// 	return m, nil
+	// }
 }
 
 // OriginatorAdd - Will return originator address known as net.RemoteAddr()
@@ -198,7 +200,6 @@ func (c *SocketConnection) ReadMessage() (*Message, error) {
 
 // Handle - Will handle new messages and close connection when there are no messages left to process
 func (c *SocketConnection) Handle() {
-	Debug("Handle ...")
 
 	done := make(chan bool)
 
@@ -229,21 +230,9 @@ func (c *SocketConnection) Handle() {
 
 // Close - Will close down net connection and return error if error happen
 func (c *SocketConnection) Close() error {
-	Debug("Close ...")
 	if err := c.Conn.Close(); err != nil {
 		Debug("Close err :",err)
-	}
-
-	for {
-		select {
-		case err := <- c.err:
-			Debug("Closing err :",err)
-		case message := <- c.m:
-			Debug("Closing message :",message)
-		case <-time.After(5*time.Second):
-			Debug("Closing timeout")
-			return nil
-		}
+		return err
 	}
 
 	return nil
