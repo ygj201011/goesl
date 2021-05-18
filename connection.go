@@ -212,8 +212,10 @@ func (c *SocketConnection) Handle() {
 			if err != nil {
 				Debug("send err :",err)
 				c.err <- err
-				done <- true
-				break
+				if !strings.Contains(err.Error(), "Got error while reading from reply command") {
+					done <- true
+					break
+				}
 			}
 
 			c.m <- msg
